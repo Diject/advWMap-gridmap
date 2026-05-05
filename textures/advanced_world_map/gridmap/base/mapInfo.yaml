@@ -1,0 +1,13 @@
+version: 3
+time: 1777998058
+width: 15960
+height: 7373
+tileSize: 512
+pixelsPerCell: 40
+gridX:
+  min: -249.0
+  max: 149.0
+gridY:
+  min: -120.0
+  max: 63.325
+bColor: [0.521569, 0.643137, 0.701961]

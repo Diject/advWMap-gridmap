@@ -1,0 +1,15 @@
+ModName: "Advanced World Map Gridmap"
+ModDescription: "A Tamriel gridmap for Advanced World Map."
+
+ConfigChangeWarning: "{id} setting has been overridden by Advanced World Map Gridmap and will not take effect."
+
+MainSettings: "General"
+MainSettingsDescription: "These settings require a restart to take effect."
+WorldMarkerShadowEnabled: "Enable text shadow for location names"
+WorldDefaultColor: "Undiscovered location marker color"
+WorldDefaultLightColor: "Discovered location marker color"
+WorldDefaultDarkColor: "Undiscovered local marker color"
+WorldMarkerShadowColor: "Location marker shadow color"
+LegendAlphaCity: "Location marker opacity"
+LegendAlphaRegion: "Region marker opacity"
+WaterColor: "Water color"
