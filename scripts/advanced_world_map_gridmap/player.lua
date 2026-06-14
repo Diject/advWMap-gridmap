@@ -27,6 +27,8 @@ local protectedConfigs = {
     ["ui.worldDefaultLightColor"] = true,
     ["ui.worldMarkerShadowColor"] = true,
     ["ui.worldMarkerShadowLightColor"] = true,
+    ["ui.markerBackgroundAltColor"] = true,
+    ["legend.alpha.backgroundAlt"] = true,
     ["ui.worldMarkerShadow"] = true,
     ["legend.alpha.city"] = true,
     ["legend.alpha.region"] = true,
@@ -39,6 +41,9 @@ local function restoreConfig(data)
     data.ui.worldDefaultLightColor = settingStorage:get("worldDefaultLightColor") or util.color.rgb(1, 1, 1)
     data.ui.worldMarkerShadowColor = settingStorage:get("worldMarkerShadowColor") or util.color.rgb(0, 0, 0)
     data.ui.worldMarkerShadowLightColor = settingStorage:get("worldMarkerShadowLightColor") or util.color.rgb(0.760784, 0.631372, 0.494117)
+    data.ui.markerBackgroundAltColor = util.color.rgb(0.45, 0.45, 0.45)
+    data.legend.alpha.backgroundAlt = 75
+
     local shadow = settingStorage:get("worldMarkerShadow")
     data.ui.worldMarkerShadow = (shadow == nil or shadow == true) and true or false
     data.legend.alpha.city = settingStorage:get("alpha.city") or 90
