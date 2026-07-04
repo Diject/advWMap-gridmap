@@ -1,5 +1,6 @@
 local I = require("openmw.interfaces")
 local util = require("openmw.util")
+local storage = require("openmw.storage")
 
 
 
@@ -87,6 +88,13 @@ local function color(args)
 end
 
 
+local settingsStorage = storage.playerSection("Settings:advWMap_gridmap")
+if not settingsStorage:get("version") then
+    settingsStorage:set("worldDefaultColor", util.color.rgb(0, 0, 0))
+    settingsStorage:set("worldDefaultDarkColor", util.color.rgb(0.15, 0.15, 0))
+    settingsStorage:set("version", 1)
+end
+
 
 I.Settings.registerGroup{
     key = "Settings:advWMap_gridmap",
@@ -97,14 +105,16 @@ I.Settings.registerGroup{
     permanentStorage = true,
     order = 0,
     settings = {
-        color{key = "worldDefaultColor", name = "WorldDefaultColor", default = util.color.rgb(0, 0, 0.1)},
-        color{key = "worldDefaultDarkColor", name = "WorldDefaultDarkColor", default = util.color.rgb(0, 0.2, 0.2)},
+        color{key = "worldDefaultColor", name = "WorldDefaultColor", default = util.color.rgb(0, 0, 0)},
+        color{key = "worldDefaultDarkColor", name = "WorldDefaultDarkColor", default = util.color.rgb(0.15, 0.15, 0)},
         color{key = "worldDefaultLightColor", name = "WorldDefaultLightColor", default = util.color.rgb(1, 1, 1)},
         color{key = "waterColor", name = "WaterColor", default = util.color.rgb(0.521569, 0.643137, 0.701961)},
         boolSetting{key = "worldMarkerShadow", name = "WorldMarkerShadowEnabled", default = true},
         color{key = "worldMarkerShadowColor", name = "WorldMarkerShadowColor", default = util.color.rgb(0, 0, 0)},
         color{key = "worldMarkerShadowLightColor", name = "WorldMarkerShadowLightColor", default = util.color.rgb(0.760784, 0.631372, 0.494117)},
+        color{key = "markerBackgroundColor", name = "MarkerBackgroundColor", default = util.color.rgb(0.55, 0.55, 0.55)},
         numberSetting{key = "alpha.city", name = "LegendAlphaCity", default = 90, min = 0, max = 100},
         numberSetting{key = "alpha.region", name = "LegendAlphaRegion", default = 7, min = 0, max = 100},
+        numberSetting{key = "alpha.background", name = "LegendAlphaMarkerBackground", default = 80, min = 0, max = 100},
     },
 }

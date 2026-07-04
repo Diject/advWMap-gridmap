@@ -104,7 +104,7 @@ def split_image():
             # Save the cell
             filename = f"({cell_x},{cell_y}).png"
             filepath = os.path.join(output_dir, filename)
-            cell_img.save(filepath, 'PNG')
+            cell_img.save(filepath, 'PNG', compress_level=1)
             saved_count += 1
     
     # Create mapInfo.yaml
