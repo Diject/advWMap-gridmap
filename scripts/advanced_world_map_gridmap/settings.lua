@@ -116,5 +116,7 @@ I.Settings.registerGroup{
         numberSetting{key = "alpha.city", name = "LegendAlphaCity", default = 90, min = 0, max = 100},
         numberSetting{key = "alpha.region", name = "LegendAlphaRegion", default = 7, min = 0, max = 100},
         numberSetting{key = "alpha.background", name = "LegendAlphaMarkerBackground", default = 80, min = 0, max = 100},
+        boolSetting{key = "enableOldMapOverlay", name = "EnableOldMapOverlay", description = "EnableOldMapOverlayDescription", default = true},
+        numberSetting{key = "oldMapOverlayAlpha", name = "OldMapOverlayAlpha", default = 9, min = 0, max = 100},
     },
 }

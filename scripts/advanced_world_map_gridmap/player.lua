@@ -20,7 +20,9 @@ local baseDir = "textures/advanced_world_map/gridmap/base/"
 local totspDir = "textures/advanced_world_map/gridmap/totsp/"
 
 local protectedConfigs = {
-    ["data.initializer"] = true,
+    ["data.altExMapPath"] = true,
+    ["data.altExMapInfo"] = true,
+    ["data.altExMapAlpha"] = true,
 
     ["ui.worldDefaultColor"] = true,
     ["ui.worldDefaultDarkColor"] = true,
@@ -33,6 +35,9 @@ local protectedConfigs = {
     ["legend.alpha.city"] = true,
     ["legend.alpha.region"] = true,
 }
+
+local oldMapInfo
+local oldDirPath
 
 
 local function restoreConfig(data)
@@ -48,6 +53,16 @@ local function restoreConfig(data)
     data.ui.worldMarkerShadow = (shadow == nil or shadow == true) and true or false
     data.legend.alpha.city = settingStorage:get("alpha.city") or 90
     data.legend.alpha.region = settingStorage:get("alpha.region") or 7
+
+    if settingStorage:get("enableOldMapOverlay") and oldMapInfo and oldDirPath then
+        data.data.altExMapAlpha = settingStorage:get("oldMapOverlayAlpha") or 6
+        data.data.altExMapInfo = oldMapInfo
+        data.data.altExMapPath = oldDirPath
+    else
+        data.data.altExMapAlpha = nil
+        data.data.altExMapInfo = nil
+        data.data.altExMapPath = nil
+    end
 end
 
 settingStorage:subscribe(async:callback(function(s, key)
@@ -61,7 +76,7 @@ local function init()
     ---@type AdvancedWorldMap.Interface
     local interface = I.AdvancedWorldMap
 
-    if not interface or interface.version < 12 then return end
+    if not interface or interface.version < 16 then return end
 
     local dir = baseDir
     local mapInfo = markup.loadYaml(dir .. "mapInfo.yaml")
@@ -73,10 +88,23 @@ local function init()
     interface.events.registerHandler(interface.events.EVENT.onWorldMapTextureInit, function (e)
         if not e.internal then return end
 
+        if e.mapInfo and e.mapInfo.waterWithAlpha and e.dirPath ~= baseDir and e.dirPath ~= totspDir then
+            oldMapInfo = e.mapInfo
+            oldDirPath = e.dirPath
+
+            restoreConfig(interface.getConfig())
+        end
+
         e.dirPath = dir
         e.mapInfo = mapInfo
         e.imagePath = nil
     end, -123)
+
+    local oMapInfo, oDirPath = interface.getWorldMapInfo()
+    if oMapInfo and oDirPath and oMapInfo.waterWithAlpha and oDirPath ~= baseDir and oDirPath ~= totspDir then
+        oldMapInfo = oMapInfo
+        oldDirPath = oDirPath
+    end
 
     if not interface.setWorldMapInfo(mapInfo, dir) then return end
 
@@ -92,6 +120,16 @@ local function init()
                 e.path = path
             end
         end, -123)
+
+        interface.events.registerHandler(interface.events.EVENT.onWorldMapOverlayTextureGet, function (e)
+            if e.mapInfo ~= oldMapInfo then return end
+            local id = string.format("(%d,%d).png", e.x, e.y)
+            local path = "textures/advanced_world_map/default/TotSP/"..id
+
+            if vfs.fileExists(path) then
+                e.path = path
+            end
+        end, 1050)
     end
 
 
@@ -104,6 +142,75 @@ local function init()
     end, -123)
 
     restoreConfig(interface.getConfig())
+
+    interface.events.registerHandler(interface.events.EVENT.onLegendWidgetCreate, function (e)
+        if not oldMapInfo or not oldDirPath then return end
+
+        local flexContent = ui.content{}
+        local cfg = interface.getConfig()
+
+        local size = e.size
+
+        local function addVPadding(elem, padding)
+            return {
+                type = ui.TYPE.Widget,
+                props = {
+                    size = util.vector2(
+                        size.x,
+                        (elem.props.textSize or elem.props.size and elem.props.size.y or cfg.ui.fontSize) * (padding or 1.5)
+                    ),
+                },
+                content = ui.content{
+                    elem
+                }
+            }
+        end
+
+        local label = {
+            type = ui.TYPE.Text,
+            props = {
+                text = l10n("Gridmap"),
+                textSize = cfg.ui.fontSize,
+                textColor = cfg.ui.defaultColor,
+                autoSize = true,
+                anchor = util.vector2(0, 0.5),
+                position = util.vector2(4, cfg.ui.fontSize * 0.75),
+            },
+        }
+
+        local overlayCB = interface.uiElements.checkbox{
+            updateFunc = e.menu.update,
+            text = l10n("MapOverlay"),
+            textSize = cfg.ui.fontSize,
+            anchor = util.vector2(0, 0.5),
+            position = util.vector2(cfg.ui.fontSize, cfg.ui.fontSize * 0.75),
+            checked = settingStorage:get("enableOldMapOverlay"),
+            getScrollBoxMeta = function ()
+                return e.scrollBox
+            end,
+            event = function (checked, layout)
+                settingStorage:set("enableOldMapOverlay", checked)
+                if not e.menu.mapWidget.cellId then
+                    e.menu.mapWidget:updateMarkers(true)
+                end
+            end
+        }
+
+        flexContent:add(
+            addVPadding(label)
+        )
+        flexContent:add(
+            addVPadding(overlayCB)
+        )
+
+        e.content:add{
+            type = ui.TYPE.Flex,
+            props = {
+                horizontal = false,
+            },
+            content = flexContent,
+        }
+    end, 1050)
 end
 
 

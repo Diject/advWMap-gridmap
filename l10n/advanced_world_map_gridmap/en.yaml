@@ -3,6 +3,9 @@ ModDescription: "A Tamriel gridmap for Advanced World Map."
 
 ConfigChangeWarning: "{id} setting has been overridden by Advanced World Map Gridmap and will not take effect."
 
+Gridmap: "Gridmap"
+MapOverlay: "Overlay"
+
 MainSettings: "General"
 MainSettingsDescription: "These settings require a restart to take effect."
 WorldMarkerShadowEnabled: "Enable text shadow for location names"
@@ -16,3 +19,6 @@ LegendAlphaCity: "Location marker opacity"
 LegendAlphaRegion: "Region marker opacity"
 LegendAlphaMarkerBackground: "Local marker background opacity"
 WaterColor: "Water color"
+EnableOldMapOverlay: "Show original map overlay"
+EnableOldMapOverlayDescription: "If enabled, the original map will be displayed as an overlay. This helps to see which areas are actually installed, as the gridmap shows the territory for all possible landmasses regardless of installation."
+OldMapOverlayAlpha: "Original map overlay opacity"
