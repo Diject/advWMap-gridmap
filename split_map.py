@@ -10,9 +10,9 @@ import math
 Image.MAX_IMAGE_PIXELS = None
 
 # === CONSTANTS ===
-INPUT_IMAGE_PATH = r"D:\Projects\Gridmap_scr\textures\advanced_world_map\custom\gridmap.png"
+INPUT_IMAGE_PATH = r"D:\Projects\Gridmap_scr\textures\advanced_world_map\custom\gridmap10.png"
 PIXELS_PER_CELL = 40
-CELL_SIZE = 512
+CELL_SIZE = 1024
 
 # Zero point coordinates on the source image (x, y)
 ZERO_POINT_X = 9960
@@ -60,6 +60,7 @@ def split_image():
     
     saved_count = 0
     skipped_count = 0
+    saved_textures = []
     
     for cell_y in range(min_cell_y, max_cell_y + 1):
         for cell_x in range(min_cell_x, max_cell_x + 1):
@@ -106,6 +107,7 @@ def split_image():
             filepath = os.path.join(output_dir, filename)
             cell_img.save(filepath, 'PNG', compress_level=1)
             saved_count += 1
+            saved_textures.append(filename)
     
     # Create mapInfo.yaml
     # Grid size in cells (one cell = PIXELS_PER_CELL x PIXELS_PER_CELL pixels)
@@ -114,12 +116,15 @@ def split_image():
     grid_y_min = -(height - ZERO_POINT_Y) / PIXELS_PER_CELL
     grid_y_max = ZERO_POINT_Y / PIXELS_PER_CELL - 1
     
+    textures_yaml = "\n".join([f"  \"{name}\": 1" for name in saved_textures])
+    
     yaml_content = f"""version: 3
 time: {int(time.time())}
 width: {width}
 height: {height}
 tileSize: {CELL_SIZE}
 pixelsPerCell: {PIXELS_PER_CELL}
+waterWithAlpha: true
 gridX:
   min: {grid_x_min}
   max: {grid_x_max}
@@ -127,6 +132,8 @@ gridY:
   min: {grid_y_min}
   max: {grid_y_max}
 bColor: [0.521569, 0.643137, 0.701961]
+textures:
+{textures_yaml}
 """
     
     yaml_path = os.path.join(output_dir, "mapInfo.yaml")
