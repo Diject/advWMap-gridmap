@@ -110,12 +110,20 @@ local function init()
 
 
     if core.contentFiles.has(totspEsm) then
+        local availableTextures = {}
+        local mapInfoPath = totspDir.."mapInfo.yaml"
+        if vfs.fileExists(mapInfoPath) then
+            availableTextures = markup.loadYaml(mapInfoPath).textures or {}
+        end
+
         interface.events.registerHandler(interface.events.EVENT.onWorldMapTextureGet, function (e)
             if not e.mapInfo then return end
 
             local id = string.format("(%d,%d).png", e.x, e.y)
-            local path = totspDir..id
 
+            if not availableTextures[id] then return end
+
+            local path = totspDir..id
             if vfs.fileExists(path) then
                 e.path = path
             end
