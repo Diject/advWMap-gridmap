@@ -18,6 +18,8 @@ local totspEsm = "solstheim tomb of the snow prince.esm"
 
 local baseDir = "textures/advanced_world_map/gridmap/base/"
 local totspDir = "textures/advanced_world_map/gridmap/totsp/"
+local defaultTRMapDir = "textures/advanced_world_map/default/TRmap/"
+local defaultBaseMapDir = "textures/advanced_world_map/default/basemap/"
 
 local protectedConfigs = {
     ["data.altExMapPath"] = true,
@@ -31,13 +33,14 @@ local protectedConfigs = {
     ["ui.worldMarkerShadowLightColor"] = true,
     ["ui.markerBackgroundAltColor"] = true,
     ["legend.alpha.backgroundAlt"] = true,
-    ["ui.worldMarkerShadow"] = true,
+    ["legend.worldMarkerShadow"] = true,
     ["legend.alpha.city"] = true,
     ["legend.alpha.region"] = true,
 }
 
 local oldMapInfo
 local oldDirPath
+local isOldTextureDefault
 
 
 local function restoreConfig(data)
@@ -50,12 +53,12 @@ local function restoreConfig(data)
     data.legend.alpha.backgroundAlt = settingStorage:get("alpha.background") or 80
 
     local shadow = settingStorage:get("worldMarkerShadow")
-    data.ui.worldMarkerShadow = (shadow == nil or shadow == true) and true or false
+    data.legend.worldMarkerShadow = (shadow == nil or shadow == true) and true or false
     data.legend.alpha.city = settingStorage:get("alpha.city") or 90
     data.legend.alpha.region = settingStorage:get("alpha.region") or 7
 
     if settingStorage:get("enableOldMapOverlay") and oldMapInfo and oldDirPath then
-        data.data.altExMapAlpha = settingStorage:get("oldMapOverlayAlpha") or 6
+        data.data.altExMapAlpha = settingStorage:get("oldMapOverlayAlpha") or 10
         data.data.altExMapInfo = oldMapInfo
         data.data.altExMapPath = oldDirPath
     else
@@ -68,6 +71,9 @@ end
 settingStorage:subscribe(async:callback(function(s, key)
     if key and I.AdvancedWorldMap then
         restoreConfig(I.AdvancedWorldMap.getConfig())
+        if I.AdvancedWorldMap.version >= 19 then
+            I.AdvancedWorldMap._clearCache()
+        end
     end
 end))
 
@@ -91,6 +97,8 @@ local function init()
         if e.mapInfo and e.mapInfo.waterWithAlpha and e.dirPath ~= baseDir and e.dirPath ~= totspDir then
             oldMapInfo = e.mapInfo
             oldDirPath = e.dirPath
+            isOldTextureDefault = oldDirPath and (oldDirPath:find(defaultTRMapDir, nil, true) or
+                oldDirPath:find(defaultBaseMapDir, nil, true)) and true or false
 
             restoreConfig(interface.getConfig())
         end
@@ -104,10 +112,13 @@ local function init()
     if oMapInfo and oDirPath and oMapInfo.waterWithAlpha and oDirPath ~= baseDir and oDirPath ~= totspDir then
         oldMapInfo = oMapInfo
         oldDirPath = oDirPath
+        isOldTextureDefault = oldDirPath and (oldDirPath:find(defaultTRMapDir, nil, true) or
+            oldDirPath:find(defaultBaseMapDir, nil, true)) and true or false
     end
 
     if not interface.setWorldMapInfo(mapInfo, dir) then return end
 
+    local config = interface.getConfig()
 
     if core.contentFiles.has(totspEsm) then
         local availableTextures = {}
@@ -130,9 +141,10 @@ local function init()
         end, -123)
 
         interface.events.registerHandler(interface.events.EVENT.onWorldMapOverlayTextureGet, function (e)
-            if e.mapInfo ~= oldMapInfo then return end
+            if not isOldTextureDefault or e.mapInfo ~= oldMapInfo then return end
             local id = string.format("(%d,%d).png", e.x, e.y)
-            local path = "textures/advanced_world_map/default/TotSP/"..id
+            local tilemapDir = config.data.useTilemap and "tilemap/" or ""
+            local path = "textures/advanced_world_map/default/TotSP/"..tilemapDir..id
 
             if vfs.fileExists(path) then
                 e.path = path
@@ -141,7 +153,6 @@ local function init()
     end
 
 
-    local config = interface.getConfig()
 
     interface.events.registerHandler(interface.events.EVENT.onConfigChanged, function (e)
         if not protectedConfigs[e.key] then return end
