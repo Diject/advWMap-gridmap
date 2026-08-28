@@ -156,7 +156,10 @@ local function init()
 
     interface.events.registerHandler(interface.events.EVENT.onConfigChanged, function (e)
         if not protectedConfigs[e.key] then return end
-        ui.showMessage(l10n("ConfigChangeWarning", {id = e.key}))
+        ---@diagnostic disable-next-line: undefined-field
+        if not e.gridmap_suppressMessage then
+            ui.showMessage(l10n("ConfigChangeWarning", {id = e.key}))
+        end
         restoreConfig(interface.getConfig())
     end, -123)
 
