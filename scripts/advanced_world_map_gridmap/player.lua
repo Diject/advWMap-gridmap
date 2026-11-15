@@ -57,8 +57,9 @@ local function restoreConfig(data)
     data.legend.alpha.city = settingStorage:get("alpha.city") or 90
     data.legend.alpha.region = settingStorage:get("alpha.region") or 7
 
-    if settingStorage:get("enableOldMapOverlay") and oldMapInfo and oldDirPath then
-        data.data.altExMapAlpha = settingStorage:get("oldMapOverlayAlpha") or 10
+    local enableOverlay = settingStorage:get("enableOldMapOverlay")
+    if oldMapInfo and oldDirPath then
+        data.data.altExMapAlpha = enableOverlay and (settingStorage:get("oldMapOverlayAlpha") or 10) or 0
         data.data.altExMapInfo = oldMapInfo
         data.data.altExMapPath = oldDirPath
     else
