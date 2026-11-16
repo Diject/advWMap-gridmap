@@ -45,12 +45,13 @@ local isOldTextureDefault
 
 local function restoreConfig(data)
     data.ui.worldDefaultColor = settingStorage:get("worldDefaultColor") or util.color.rgb(0, 0, 0)
-    data.ui.worldDefaultDarkColor = settingStorage:get("worldDefaultDarkColor") or util.color.rgb(0.15, 0.15, 0)
+    data.ui.worldDefaultAltColor = settingStorage:get("worldDefaultAltColor") or util.color.rgb(0.98, 0.98, 0.4)
+    data.ui.worldDefaultDarkColor = settingStorage:get("worldDefaultDarkColor") or util.color.rgb(0.6, 0.6, 0)
     data.ui.worldDefaultLightColor = settingStorage:get("worldDefaultLightColor") or util.color.rgb(1, 1, 1)
     data.ui.worldMarkerShadowColor = settingStorage:get("worldMarkerShadowColor") or util.color.rgb(0, 0, 0)
     data.ui.worldMarkerShadowLightColor = settingStorage:get("worldMarkerShadowLightColor") or util.color.rgb(0.760784, 0.631372, 0.494117)
-    data.ui.markerBackgroundAltColor = settingStorage:get("markerBackgroundColor") or util.color.rgb(0.55, 0.55, 0.55)
-    data.legend.alpha.backgroundAlt = settingStorage:get("alpha.background") or 80
+    data.ui.markerBackgroundAltColor = settingStorage:get("markerBackgroundColor") or util.color.rgb(0, 0, 0)
+    data.legend.alpha.backgroundAlt = settingStorage:get("alpha.background") or 70
 
     local shadow = settingStorage:get("worldMarkerShadow")
     data.legend.worldMarkerShadow = (shadow == nil or shadow == true) and true or false

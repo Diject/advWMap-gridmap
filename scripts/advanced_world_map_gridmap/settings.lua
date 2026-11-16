@@ -89,11 +89,17 @@ end
 
 
 local settingsStorage = storage.playerSection("Settings:advWMap_gridmap")
-if not settingsStorage:get("version") then
+local version = settingsStorage:get("version")
+if not version then
     settingsStorage:set("worldDefaultColor", util.color.rgb(0, 0, 0))
     settingsStorage:set("worldDefaultDarkColor", util.color.rgb(0.15, 0.15, 0))
-    settingsStorage:set("version", 1)
 end
+if not version or version == 1 then
+    settingsStorage:set("worldDefaultAltColor", util.color.rgb(0.98, 0.98, 0.4))
+    settingsStorage:set("worldDefaultDarkColor", util.color.rgb(0.6, 0.6, 0))
+    settingsStorage:set("markerBackgroundColor", util.color.rgb(0, 0, 0))
+end
+settingsStorage:set("version", 2)
 
 
 I.Settings.registerGroup{
@@ -106,16 +112,17 @@ I.Settings.registerGroup{
     order = 0,
     settings = {
         color{key = "worldDefaultColor", name = "WorldDefaultColor", default = util.color.rgb(0, 0, 0)},
-        color{key = "worldDefaultDarkColor", name = "WorldDefaultDarkColor", default = util.color.rgb(0.15, 0.15, 0)},
+        color{key = "worldDefaultDarkColor", name = "WorldDefaultDarkColor", default = util.color.rgb(0.6, 0.6, 0)},
         color{key = "worldDefaultLightColor", name = "WorldDefaultLightColor", default = util.color.rgb(1, 1, 1)},
+        color{key = "worldDefaultAltColor", name = "WorldDefaultAltColor", default = util.color.rgb(1, 1, 0.4)},
         color{key = "waterColor", name = "WaterColor", default = util.color.rgb(0.521569, 0.643137, 0.701961)},
         boolSetting{key = "worldMarkerShadow", name = "WorldMarkerShadowEnabled", default = true},
         color{key = "worldMarkerShadowColor", name = "WorldMarkerShadowColor", default = util.color.rgb(0, 0, 0)},
         color{key = "worldMarkerShadowLightColor", name = "WorldMarkerShadowLightColor", default = util.color.rgb(0.760784, 0.631372, 0.494117)},
-        color{key = "markerBackgroundColor", name = "MarkerBackgroundColor", default = util.color.rgb(0.55, 0.55, 0.55)},
+        color{key = "markerBackgroundColor", name = "MarkerBackgroundColor", default = util.color.rgb(0, 0, 0)},
         numberSetting{key = "alpha.city", name = "LegendAlphaCity", default = 90, min = 0, max = 100},
         numberSetting{key = "alpha.region", name = "LegendAlphaRegion", default = 7, min = 0, max = 100},
-        numberSetting{key = "alpha.background", name = "LegendAlphaMarkerBackground", default = 80, min = 0, max = 100},
+        numberSetting{key = "alpha.background", name = "LegendAlphaMarkerBackground", default = 70, min = 0, max = 100},
         boolSetting{key = "enableOldMapOverlay", name = "EnableOldMapOverlay", description = "EnableOldMapOverlayDescription", default = true},
         numberSetting{key = "oldMapOverlayAlpha", name = "OldMapOverlayAlpha", default = 10, min = 0, max = 100},
     },
